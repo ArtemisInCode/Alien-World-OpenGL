@@ -33,7 +33,7 @@ using namespace std;
 
 float angle = 0;
 float look_x = 0;
-float look_y = 10; 
+float look_y = 15; 
 float look_z = 0;
 float eye_x = 0;
 float eye_y = 2;
@@ -72,12 +72,14 @@ float periphsS[150];
 // Aliens
 float alienAng = 0;
 bool aUp = true;
-float alienX = 5;
-float alienZ = 0;
+float alien1X = 5;
+float alienTheta = 0;
+float alien2X = 0;
+float alien2Z = 0;
 float alienDirUp = true;
 
 
-GLuint texId[13];
+GLuint texId[14];
 
 float white[4]  = {1.0, 1.0, 1.0, 1.0};
 float red[4]  = {1.0, 0.0, 0.0, 1.0};
@@ -115,7 +117,7 @@ list<particle> fireParList;	//List of particles
 
 //--------Textures----------------------------
 void loadTextures(void) {
-    glGenTextures(13, texId);
+    glGenTextures(14, texId);
 
     glBindTexture(GL_TEXTURE_2D, texId[0]);
     loadTGA("../skybox/frost_lf.tga");
@@ -196,6 +198,11 @@ void loadTextures(void) {
 
     glBindTexture(GL_TEXTURE_2D, texId[12]);
     loadTGA("../textures/line_conc.tga");
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+
+    glBindTexture(GL_TEXTURE_2D, texId[13]);
+    loadTGA("../textures/lake.tga");
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
@@ -905,7 +912,7 @@ void drawTBridge(void) {
 void walkingAlien(void) {
     glPushMatrix();
 
-    glTranslatef(alienX, 15, 0.0);
+    glTranslatef(alien1X, 15, 0.0);
     glRotatef(90.0, 0.0, 1.0, 0.0);
     drawAlien();
 
@@ -955,7 +962,7 @@ void drawLaunchMelt(void) {
 
 void drawRocketSet(void) {
     //Draws rocket and tower set up
-
+    
     glPushMatrix();
 
     glTranslatef(0, 0, 15);
@@ -964,6 +971,17 @@ void drawRocketSet(void) {
     drawTower();
 
 	glPopMatrix();
+}
+
+// Second Alien
+
+void groundAlien(void) {
+    glPushMatrix();
+    glTranslatef(-25.0, 0.0, 5.0);
+    glRotatef(alienTheta, 0.0, 1.0, 0.0);
+    glTranslatef(5.0, 0.0, 4.0);
+    drawAlien();
+    glPopMatrix();
 }
 
 // Environment peripherals
@@ -1172,6 +1190,31 @@ void droneSearch(void) {
     }
 }
 
+// Lake
+void drawLake(void) {
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texId[13]);
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_QUADS);
+        // Bottom
+        glTexCoord2f(0,1);
+        glVertex3f(5.0, 0.0, 5.0);
+        glTexCoord2f(0,0);
+        glVertex3f(5.0, 0.0, -50.0);
+        glTexCoord2f(1,0);
+        glVertex3f(60.0, 0.0, -50.0);
+        glTexCoord2f(1,1);
+        glVertex3f(60.0, 0.0, 5.0);
+    
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+}
+
+
+
 // Shadows
 
 void drawBoosterShadows(void) {
@@ -1252,6 +1295,7 @@ void drawShadows(float shadowMat[16]) {
 		glColor4f(0.2, 0.2, 0.2, 1.0);
 		drawRocketSetShadow();
 	glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
 
 
@@ -1300,8 +1344,8 @@ void drawFloor()
 void myTimer(int value)
 {
     if (takeoff) {
-        if (alienX > 2) {
-            alienX -= 0.1;
+        if (alien1X > 2) {
+            alien1X -= 0.1;
         } else if (bridgeAngle < 90) {
             bridgeAngle ++;
             meltRad += 0.075;
@@ -1310,14 +1354,14 @@ void myTimer(int value)
             meltRad -= 0.025;
         }} else {
             if (alienDirUp) {
-                if (alienX < 8) {
-                    alienX += 0.05;
+                if (alien1X < 8) {
+                    alien1X += 0.05;
                 } else {
                     alienDirUp = false;
                 } 
             } else {
-                if (alienX > 2) {
-                    alienX -= 0.05;
+                if (alien1X > 2) {
+                    alien1X -= 0.05;
                 } else {
                     alienDirUp = true;
                 }
@@ -1353,10 +1397,11 @@ void myTimer(int value)
 	
 	if (aUp)
 	{
-		alienAng ++;
+		alienAng += 2;
 	} else {
-		alienAng --;
+		alienAng -= 2;
 	}
+    alienTheta += 0.5;
     //Alien walking translation
     
     
@@ -1364,7 +1409,7 @@ void myTimer(int value)
     
 
     // alienZ +=0.1;
-    // alienX;
+    // alien1X;
 
     tick++;
     if (tick == INT_MAX) tick = 0;
@@ -1402,6 +1447,8 @@ void display()
 
 	glPushMatrix();
     drawDrone();
+    groundAlien();
+    drawLake();
     drawPeriphs();
     drawShadows(shadowMat);
     drawRocketSet();
