@@ -23,7 +23,7 @@ using namespace std;
 
 
 //TODOs -  another aliens on path, add lights or animation to rocket, fix normals for sweep, add some small environment details, fix lighting - specular etc
-// Make things look nice, second alien on floor, cylinders
+// Make things look nice, second alien on floor
 // https://www.desmos.com/calculator/imu6gndlfx for the spotlight math
 
 
@@ -41,7 +41,7 @@ float eye_z = 0;
 
 // Environment set up
 float skyWidth = 300;
-float fWidth = 75; // Floor width/length
+float fWidth = 100; // Floor width/length
 
 GLUquadric *q;
 
@@ -64,6 +64,10 @@ float droneSweep = 0.0;
 bool droneSUp = true;
 int leg = 1;
 bool legFirst = true;
+
+float periphsX[150];
+float periphsZ[150];
+float periphsS[150];
 
 // Aliens
 float alienAng = 0;
@@ -849,7 +853,6 @@ void drawTanks(void) {
 }
 
 
-//TODO change to three quads
 void drawTBridge(void) {
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -956,7 +959,6 @@ void drawRocketSet(void) {
     glPushMatrix();
 
     glTranslatef(0, 0, 15);
-
 	drawRocket();
     drawLaunchMelt();
     drawTower();
@@ -964,13 +966,44 @@ void drawRocketSet(void) {
 	glPopMatrix();
 }
 
+// Environment peripherals
+
 // Dome building
 
-void drawDome(void) {
+void drawRock(size_t i) {
     glPushMatrix();
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texId[8]);
+    glColor3f(1.0, 1.0, 1.0);
     glTranslatef(15.0, 0.0, -5);
-    // glScalef(1.0, 1.5, 1.0);
-    gluSphere(q, 5.0, 4.0, 20);
+    gluSphere(q, periphsS[i], 4.0, 4.0);
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+}
+
+void assignPeriphs(void) {
+    std::uniform_int_distribution<> distrib(-fWidth-20, fWidth-20);
+    std::uniform_int_distribution<> distribS(0.01, 1.5);
+    for (size_t i = 0; i < 100; i++) {
+        periphsX[i] = (float)distrib(gen);
+        periphsZ[i] = (float)distrib(gen);
+        periphsS[i] = (float)distribS(gen);
+    }
+
+}
+
+void drawPeriphs(void) {
+    glPushMatrix();
+    std::uniform_int_distribution<> distrib(-fWidth, fWidth);
+    for (size_t i = 0; i < 150; i++) {
+        
+        glPushMatrix();
+        glTranslatef(periphsX[i], 0.0, periphsZ[i]);
+        drawRock(i);
+        glPopMatrix();
+    }
+
     glPopMatrix();
 }
 
@@ -1230,13 +1263,14 @@ void drawFloor()
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texId[6]);
-
 	glBegin(GL_QUADS);
 	glNormal3f(0, 1, 0);
+    // float alpha = 1;
 	for(int x = -fWidth; x <= fWidth; x ++)
 	{
 		for(int z = -fWidth; z <= fWidth; z ++)
 		{
+            // alpha = (float)((x+fWidth)/(2*fWidth) +(z+fWidth)/(2*fWidth))/2;
 			glColor3f(1.0, 1.0, 1.0);
 
             glTexCoord2f((float)10*(x+fWidth)/(2*fWidth), (float)10*(z+fWidth)/(2*fWidth));
@@ -1257,6 +1291,7 @@ void drawFloor()
 		}
 	}
 	glEnd();
+
     glDisable(GL_TEXTURE_2D);
 }
 
@@ -1367,7 +1402,7 @@ void display()
 
 	glPushMatrix();
     drawDrone();
-    drawDome();
+    drawPeriphs();
     drawShadows(shadowMat);
     drawRocketSet();
 
@@ -1429,6 +1464,7 @@ void initialize()
 	glLoadIdentity();
 	gluPerspective(60., 1., 1., 1000.);  //The camera view volume  
 
+    assignPeriphs();
     glutTimerFunc(50, myTimer, 0);
 }
 
