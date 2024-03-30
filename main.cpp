@@ -526,7 +526,6 @@ void updateFireQueue()
 void drawBody(void) {
     //Draws the body of the rocket
     glPushMatrix();
-    glColor3f(0.5, 0.5, 0.5);
     glTranslatef(0, 22, 0);
     glRotatef(90, 1, 0, 0);
     gluCylinder(q, 2.0, 2.0, 20.0, 20, 10);
@@ -536,7 +535,6 @@ void drawBody(void) {
 void drawNose(void) {
     //Draws the head of the rocket
     glPushMatrix();
-    glColor3f(0.5, 0.5, 0.5);
     glTranslatef(0, 22, 0);
     glRotatef(-90, 1, 0, 0);
     gluCylinder(q, 2.0, 1.0, 2.0, 20.0, 5.0);
@@ -545,7 +543,6 @@ void drawNose(void) {
 
 void drawNoseTip(void) {
     glPushMatrix();
-    glColor3f(0.5, 0.5, 0.5);
     glTranslatef(0, 24, 0);
     glRotatef(-90, 1, 0, 0);
     gluCylinder(q, 1.0, 0.1, 2.0, 20.0, 5.0);
@@ -596,7 +593,7 @@ void drawBoostersBody(void) {
 
 void drawBoostersNose(void) {
     glPushMatrix();
-    glColor3f(0.5, 0.5, 0.5);
+    // glColor3f(0.5, 0.5, 0.5);
 
     glPushMatrix();
     glTranslatef(0, 17, 3);
@@ -684,6 +681,7 @@ void drawRocket(void) {
 
     glTranslatef(5.0, rocketHgt, 0.0);
     glBindTexture(GL_TEXTURE_2D, texId[6]);
+    glColor3f(0.5, 0.5, 0.5);
     drawBody();
     glBindTexture(GL_TEXTURE_2D, texId[10]);
     drawNose();
@@ -768,10 +766,6 @@ void drawAlien(void) {
 
 void drawTowerBody(void) {
 
-	// glEnable(GL_LIGHTING);
-	glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texId[10]);
-
     float toRadians = M_PI / 180.0;   //Conversion from degrees to radians
 	float angStep = 10.0 * toRadians;  //Rotate base curve in 10 deg steps
 	int nSlices = 36;				  //36 slices at 10 deg intervals
@@ -855,19 +849,6 @@ void drawTanks(void) {
 }
 
 
-
-
-void drawTowerBod(void) {
-    glPushMatrix();
-    // glColor3f(1, 0.75, 0.5);
-    glColor3f(1.0, 1.0, 1.0);
-    // glTranslatef(0.0, 15.0, 0.0);
-    glScalef(0.4, 0.5, 0.5);
-    drawTowerBody();
-    // glutSolidCube(1.0);
-    glPopMatrix();
-}
-
 //TODO change to three quads
 void drawTBridge(void) {
     glPushMatrix();
@@ -914,8 +895,6 @@ void drawTBridge(void) {
     
     glEnd();
 
-    // glScalef(6.0, 1.0, 2.0);
-    // glutSolidCube(1.0);
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
@@ -932,13 +911,31 @@ void walkingAlien(void) {
 
 void drawTower(void) {
     //Draws Tower
+    glEnable(GL_TEXTURE_2D);
     glPushMatrix();
     glTranslatef(-5.0, 0.0, 0.0);
-    drawTowerBod();
+
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, texId[10]);
+    glColor3f(1.0, 1.0, 1.0);
+    glScalef(0.4, 0.5, 0.5);
+    drawTowerBody();
+    glPopMatrix();
+    // Idk why but I can't move the textures for the others here
+    glPushMatrix();
     drawTanks();
+    glPopMatrix();
+
+    glPushMatrix();
     walkingAlien();
+    glPopMatrix();
+
+    glPushMatrix();
     drawTBridge();
     glPopMatrix();
+
+    glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
 }
 
 void drawLaunchMelt(void) {
@@ -1166,14 +1163,61 @@ void drawRocketShadows(void) {
 }
 
 
+
+void drawTankShadow(void) {
+    glPushMatrix();
+    glTranslatef(-20, 0.0, -10.0);
+    glPushMatrix();
+    glRotatef(-90, 1, 0.0, 0);
+    gluCylinder(q, 2.0, 2.0, 10.0, 20.0, 10.0);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(2.0, 0.0, 2.0);
+    glRotatef(-90, 1, 0, 0);
+    gluCylinder(q, 2.0, 2.0, 20.0, 20.0, 10.0);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(-2.0, 0, 2.0);
+    glRotatef(-90, 1, 0, 0);
+    gluCylinder(q, 2.0, 2.0, 15.0, 20.0, 10.0);
+    glPopMatrix();
+    glPopMatrix();
+}
+
+void drawTowerShadow(void) {
+    //Draws Tower
+    glPushMatrix();
+    glTranslatef(-5.0, 0.0, 0.0);
+    glPushMatrix();
+    glScalef(0.4, 0.5, 0.5);
+    drawTowerBody();
+    glPopMatrix();
+    drawTankShadow();
+    glPopMatrix();
+
+}
+
+void drawRocketSetShadow(void) {
+    //Draws rocket and tower set up
+
+    glPushMatrix();
+
+    glTranslatef(0, 0, 15);
+
+	drawRocketShadows();
+
+    drawTowerShadow();
+
+	glPopMatrix();
+}
+
 void drawShadows(float shadowMat[16]) {
     
     glDisable(GL_LIGHTING);
     glPushMatrix();
 		glMultMatrixf(shadowMat);
-		glColor3f(0.2, 0.2, 0.2);
-		//glTranslatef(0.0, 0.6, 0.0);
-		drawRocketShadows();
+		glColor4f(0.2, 0.2, 0.2, 1.0);
+		drawRocketSetShadow();
 	glPopMatrix();
 }
 
@@ -1197,19 +1241,19 @@ void drawFloor()
 
             glTexCoord2f((float)10*(x+fWidth)/(2*fWidth), (float)10*(z+fWidth)/(2*fWidth));
             // glTexCoord2f(0, 0);
-			glVertex3f(x, 0, z);
+			glVertex3f(x, -0.1, z);
 
             glTexCoord2f((float)10*(x+fWidth)/(2*fWidth), (float)10*(z+fWidth+1)/(2*fWidth));
             // glTexCoord2f(0, 1);
-			glVertex3f(x, 0, z+1);
+			glVertex3f(x, -0.1, z+1);
 
             glTexCoord2f((float)10*(x+fWidth+1)/(2*fWidth), (float)10*(z+fWidth+1)/(2*fWidth));
             // glTexCoord2f(1, 1);
-			glVertex3f(x+1, 0, z+1);
+			glVertex3f(x+1, -0.1, z+1);
 
             glTexCoord2f((float)10*(x+fWidth+1)/(2*fWidth), (float)10*(z+fWidth)/(2*fWidth));
             // glTexCoord2f(1, 0);
-			glVertex3f(x+1, 0, z);
+			glVertex3f(x+1, -0.1, z);
 		}
 	}
 	glEnd();
