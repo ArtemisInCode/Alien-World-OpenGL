@@ -18,12 +18,11 @@
 #include <random>
 #include "loadTGA.h"
 #include "loadBMP.h"
-// #include "RocketModels.h"
 using namespace std;
 
 
-//TODOs -  another aliens on path, add lights or animation to rocket, fix normals for sweep, add some small environment details, fix lighting - specular etc
-// Make things look nice, second alien on floor
+//TODOs -add lights or animation to rocket, fix normals for sweep,  fix lighting - specular etc
+//TODO clean up
 // https://www.desmos.com/calculator/imu6gndlfx for the spotlight math
 
 
@@ -41,7 +40,7 @@ float eye_z = 0;
 
 // Environment set up
 float skyWidth = 300;
-float fWidth = 100; // Floor width/length
+float fWidth = 75; // Floor width/length
 
 GLUquadric *q;
 
@@ -79,7 +78,7 @@ float alien2Z = 0;
 float alienDirUp = true;
 
 
-GLuint texId[14];
+GLuint texId[15];
 
 float white[4]  = {1.0, 1.0, 1.0, 1.0};
 float red[4]  = {1.0, 0.0, 0.0, 1.0};
@@ -117,7 +116,7 @@ list<particle> fireParList;	//List of particles
 
 //--------Textures----------------------------
 void loadTextures(void) {
-    glGenTextures(14, texId);
+    glGenTextures(15, texId);
 
     glBindTexture(GL_TEXTURE_2D, texId[0]);
     loadTGA("../skybox/frost_lf.tga");
@@ -163,7 +162,7 @@ void loadTextures(void) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glBindTexture(GL_TEXTURE_2D, texId[6]);
-    loadTGA("../textures/snow_2.tga");
+    loadTGA("../textures/gound.tga");
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
@@ -203,6 +202,11 @@ void loadTextures(void) {
 
     glBindTexture(GL_TEXTURE_2D, texId[13]);
     loadTGA("../textures/lake.tga");
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+
+    glBindTexture(GL_TEXTURE_2D, texId[14]);
+    loadTGA("../textures/snow_2.tga");
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
@@ -691,7 +695,7 @@ void drawRocket(void) {
     glEnable(GL_TEXTURE_2D);
 
     glTranslatef(5.0, rocketHgt, 0.0);
-    glBindTexture(GL_TEXTURE_2D, texId[6]);
+    glBindTexture(GL_TEXTURE_2D, texId[14]);
     glColor3f(0.5, 0.5, 0.5);
     drawBody();
     glBindTexture(GL_TEXTURE_2D, texId[10]);
@@ -711,7 +715,7 @@ void drawRocket(void) {
 
 void drawAlien(void) {
     glPushMatrix();
-    glColor3f(0.3, 0.3, 0.3);
+    glColor3f(0.0, 0.8, 0.53);
 
     //Head
 	glPushMatrix();
@@ -1317,19 +1321,19 @@ void drawFloor()
             // alpha = (float)((x+fWidth)/(2*fWidth) +(z+fWidth)/(2*fWidth))/2;
 			glColor3f(1.0, 1.0, 1.0);
 
-            glTexCoord2f((float)10*(x+fWidth)/(2*fWidth), (float)10*(z+fWidth)/(2*fWidth));
+            glTexCoord2f((float)(x+fWidth)/(2*fWidth), (float)(z+fWidth)/(2*fWidth));
             // glTexCoord2f(0, 0);
 			glVertex3f(x, -0.1, z);
 
-            glTexCoord2f((float)10*(x+fWidth)/(2*fWidth), (float)10*(z+fWidth+1)/(2*fWidth));
+            glTexCoord2f((float)(x+fWidth)/(2*fWidth), (float)(z+fWidth+1)/(2*fWidth));
             // glTexCoord2f(0, 1);
 			glVertex3f(x, -0.1, z+1);
 
-            glTexCoord2f((float)10*(x+fWidth+1)/(2*fWidth), (float)10*(z+fWidth+1)/(2*fWidth));
+            glTexCoord2f((float)(x+fWidth+1)/(2*fWidth), (float)(z+fWidth+1)/(2*fWidth));
             // glTexCoord2f(1, 1);
 			glVertex3f(x+1, -0.1, z+1);
 
-            glTexCoord2f((float)10*(x+fWidth+1)/(2*fWidth), (float)10*(z+fWidth)/(2*fWidth));
+            glTexCoord2f((float)(x+fWidth+1)/(2*fWidth), (float)(z+fWidth)/(2*fWidth));
             // glTexCoord2f(1, 0);
 			glVertex3f(x+1, -0.1, z);
 		}
@@ -1562,6 +1566,15 @@ void keyboard(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
+void reshape(int width, int height) {
+
+    glViewport(0, 0, (GLsizei)width, (GLsizei)height); // Sets viewport to size of window
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity(); // To prevent artifacts
+    gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 1000.0); // Set FoV (degrees), window aspect ratio, new and far planes
+    glMatrixMode(GL_MODELVIEW);
+}
+
 //  ------- Main: Initialize glut window and register call backs -----------
 int main(int argc, char** argv)
 {
@@ -1574,6 +1587,7 @@ int main(int argc, char** argv)
 
     glutDisplayFunc(display);
     glutSpecialFunc(special); 
+    glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     glutMainLoop();
     return 0;
