@@ -2,7 +2,6 @@
 //  COSC363: Computer Graphics (2023);  University of Canterbury.
 //
 //  FILE NAME: Alien World
-//  s
 //
 //  Artemis Hingston 83986198
 //  Use left/right arrow keys to rotate camera left/right
@@ -21,7 +20,6 @@
 using namespace std;
 
 
-//TODOs -add lights or animation to rocket, fix normals for sweep,  fix lighting - specular etc
 //TODO clean up
 // https://www.desmos.com/calculator/imu6gndlfx for the spotlight math
 
@@ -30,13 +28,13 @@ using namespace std;
 
 //Camera parameters
 
-float angle = 0;
-float look_x = 0;
-float look_y = 15; 
-float look_z = 0;
+float angle = 180;
+float look_x;
+float look_y = 5; 
+float look_z;
 float eye_x = 0;
-float eye_y = 2;
-float eye_z = 0;  
+float eye_y = 3;
+float eye_z = -30;  
 
 // Environment set up
 float skyWidth = 300;
@@ -46,12 +44,31 @@ GLUquadric *q;
 
 int tick = 0;		//Timer counter
 
+float noseAng = 180;
 float bridgeAngle = 0;
 float rocketHgt = 0;
 float meltRad = 0.0;
 
-float rLightRd = 1.0;
-float rLightGn = 0.0;
+bool lightFlip = true;
+int16_t lightSwitch = 0;
+float rL1r = 1.0;
+float rL1g = 0.0;
+float rL2r = 1.0;
+float rL2g = 0.0;
+float rL3r = 1.0;
+float rL3g = 0.0;
+float rL4r = 1.0;
+float rL4g = 0.0;
+float rL5r = 1.0;
+float rL5g = 0.0;
+float rL6r = 1.0;
+float rL6g = 0.0;
+float rL7r = 1.0;
+float rL7g = 0.0;
+float rL8r = 1.0;
+float rL8g = 0.0;
+float rL9r = 1.0;
+float rL9g = 0.0;
 
 bool takeoff = false;
 
@@ -72,6 +89,7 @@ float periphsS[150];
 float alienAng = 0;
 bool aUp = true;
 float alien1X = 5;
+float alien1Y = 24;
 float alienTheta = 0;
 float alien2X = 0;
 float alien2Z = 0;
@@ -92,11 +110,14 @@ const int N = 75;  // Total number of vertices on the base curve
 float vx_init[N] = { 12.5, 13, 13.25, 13.75, 14, 14.25, 14.5, 11, 9.5, 8, 6, 6.25, 7, 7.5, 8, 8.3, 8.6, 8.8, 8.9, 9, 8.9, 8.8, 8.6, 8.3, 8, 7.4, 6.5, 6, 4.8, 3, 2.5, 4, 5, 5.5, 5.8, 6, 6.3, 6.5, 6.6, 6.7, 6.7, 6.7, 6.7, 6.7, 6.8, 6.9, 7, 7.3, 7.7, 8.2, 8.8, 9.2, 9.7, 10.1, 10.6, 10.9, 11.2, 11.3, 11.1, 10, 8.8, 6, 5, 4, 3.7, 3.5, 3.4, 3.3, 3.2, 3.1, 3, 2.5, 1.7, 1, 0};
 float vy_init[N] = { 0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27 ,28 ,29 ,30 ,31 ,32 ,33 ,34 ,35 ,36 ,37 ,38 ,39 ,40 ,41, 42, 43 ,44 ,45 ,46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 64};
 
-//These are wrong???
 
-float nx_init[N] = { 0.8944271909999159, 0.9363291775690445, 0.9363291775690445, 0.9363291775690445, 0.9701425001453319, 0.9701425001453319, 0.0, -0.3713906763541037, -0.5547001962252291, -0.49613893835683387, 0.0, 0.8944271909999159, 0.847998304005088, 0.8944271909999159, 0.9284766908852592, 0.9578262852211515, 0.9701425001453319, 0.9889363528682973, 0.9950371902099893, 1.0, 0.9950371902099893, 0.9889363528682973, 0.9701425001453319, 0.9578262852211515, 0.9119215051751063, 0.8, 0.8192319205190405, 0.7619393177594593, 0.5547001962252291, 0.6561787149247866, 0.8944271909999159, 0.6246950475544243, 0.8, 0.9284766908852594, 0.9701425001453319, 0.9701425001453319, 0.9701425001453319, 0.9889363528682975, 0.9950371902099893, 0.9987523388778446, 1.0, 1.0, 1.0, 0.9987523388778446, 0.9950371902099893, 0.9950371902099893, 0.9805806756909203, 0.9438583563660174, 0.9119215051751065, 0.8762159086766469, 0.8944271909999159, 0.9119215051751067, 0.9119215051751063, 0.9119215051751063, 0.9284766908852592, 0.9578262852211515, 0.9805806756909201, 0.9987523388778446, 0.8384436163006369, 0.6561787149247869, 0.4472135954999579, 0.46574643283262224, 0.7071067811865475, 0.838443616300637, 0.9701425001453319, 0.9889363528682975, 0.9950371902099893, 0.9950371902099893, 0.9950371902099893, 0.9950371902099893, 0.9578262852211513, 0.838443616300637, 0.8, 0.0};
+// float nx_init[N] = { 0.8944271909999159, 0.9363291775690445, 0.9363291775690445, 0.9363291775690445, 0.9701425001453319, 0.9701425001453319, 0.0, -0.3713906763541037, -0.5547001962252291, -0.49613893835683387, 0.0, 0.8944271909999159, 0.847998304005088, 0.8944271909999159, 0.9284766908852592, 0.9578262852211515, 0.9701425001453319, 0.9889363528682973, 0.9950371902099893, 1.0, 0.9950371902099893, 0.9889363528682973, 0.9701425001453319, 0.9578262852211515, 0.9119215051751063, 0.8, 0.8192319205190405, 0.7619393177594593, 0.5547001962252291, 0.6561787149247866, 0.8944271909999159, 0.6246950475544243, 0.8, 0.9284766908852594, 0.9701425001453319, 0.9701425001453319, 0.9701425001453319, 0.9889363528682975, 0.9950371902099893, 0.9987523388778446, 1.0, 1.0, 1.0, 0.9987523388778446, 0.9950371902099893, 0.9950371902099893, 0.9805806756909203, 0.9438583563660174, 0.9119215051751065, 0.8762159086766469, 0.8944271909999159, 0.9119215051751067, 0.9119215051751063, 0.9119215051751063, 0.9284766908852592, 0.9578262852211515, 0.9805806756909201, 0.9987523388778446, 0.8384436163006369, 0.6561787149247869, 0.4472135954999579, 0.46574643283262224, 0.7071067811865475, 0.838443616300637, 0.9701425001453319, 0.9889363528682975, 0.9950371902099893, 0.9950371902099893, 0.9950371902099893, 0.9950371902099893, 0.9578262852211513, 0.838443616300637, 0.8, 0.0};
 
-float ny_init[N] = { -0.4472135954999579, -0.3511234415883917, -0.3511234415883917, -0.3511234415883917, -0.24253562503633297, -0.24253562503633297, 1.0, 0.9284766908852594, 0.8320502943378437, 0.8682431421244593, 1.0, -0.4472135954999579, -0.52999894000318, -0.4472135954999579, -0.371390676354104, -0.2873478855663453, -0.24253562503633297, -0.14834045293024495, -0.09950371902099857, 0.0, 0.09950371902099857, 0.14834045293024495, 0.24253562503633297, 0.2873478855663453, 0.410364677328798, 0.6, 0.5734623443633284, 0.6476484200955405, 0.8320502943378437, 0.7546055221635046, -0.4472135954999579, -0.7808688094430304, -0.6, -0.37139067635410367, -0.24253562503633297, -0.24253562503633297, -0.24253562503633297, -0.14834045293024453, -0.09950371902099901, -0.049937616943892496, 0.0, 0.0, 0.0, -0.04993761694389205, -0.09950371902099901, -0.09950371902099901, -0.1961161351381838, -0.33035042472810616, -0.41036467732879767, -0.481918749772156, -0.4472135954999579, -0.4103646773287974, -0.410364677328798, -0.410364677328798, -0.371390676354104, -0.2873478855663453, -0.19611613513818418, 0.04993761694389205, 0.5449883505954143, 0.7546055221635045, 0.8944271909999159, 0.8849182223819825, 0.7071067811865475, 0.5449883505954141, 0.24253562503633297, 0.14834045293024475, 0.09950371902099901, 0.09950371902099879, 0.09950371902099879, 0.09950371902099901, 0.28734788556634544, 0.5449883505954141, 0.6, 1.0};
+// float ny_init[N] = { -0.4472135954999579, -0.3511234415883917, -0.3511234415883917, -0.3511234415883917, -0.24253562503633297, -0.24253562503633297, 1.0, 0.9284766908852594, 0.8320502943378437, 0.8682431421244593, 1.0, -0.4472135954999579, -0.52999894000318, -0.4472135954999579, -0.371390676354104, -0.2873478855663453, -0.24253562503633297, -0.14834045293024495, -0.09950371902099857, 0.0, 0.09950371902099857, 0.14834045293024495, 0.24253562503633297, 0.2873478855663453, 0.410364677328798, 0.6, 0.5734623443633284, 0.6476484200955405, 0.8320502943378437, 0.7546055221635046, -0.4472135954999579, -0.7808688094430304, -0.6, -0.37139067635410367, -0.24253562503633297, -0.24253562503633297, -0.24253562503633297, -0.14834045293024453, -0.09950371902099901, -0.049937616943892496, 0.0, 0.0, 0.0, -0.04993761694389205, -0.09950371902099901, -0.09950371902099901, -0.1961161351381838, -0.33035042472810616, -0.41036467732879767, -0.481918749772156, -0.4472135954999579, -0.4103646773287974, -0.410364677328798, -0.410364677328798, -0.371390676354104, -0.2873478855663453, -0.19611613513818418, 0.04993761694389205, 0.5449883505954143, 0.7546055221635045, 0.8944271909999159, 0.8849182223819825, 0.7071067811865475, 0.5449883505954141, 0.24253562503633297, 0.14834045293024475, 0.09950371902099901, 0.09950371902099879, 0.09950371902099879, 0.09950371902099901, 0.28734788556634544, 0.5449883505954141, 0.6, 1.0};
+
+float nx_init[N] = {0.894427, 0.936329, 0.936329, 0.936329, 0.970143, 0.970143, 0, -0.371391, -0.5547, -0.496139, 0, 0.894427, 0.847998, 0.894427, 0.928477, 0.957826, 0.970143, 0.988936, 0.995037, 1, 0.995037, 0.988936, 0.970143, 0.957826, 0.911922, 0.8, 0.819232, 0.761939, 0.5547, 0.656179, 0.894427, 0.624695, 0.8, 0.928477, 0.970143, 0.970143, 0.970143, 0.988936, 0.995037, 0.998752, 1, 1, 1, 0.998752, 0.995037, 0.995037, 0.980581, 0.943858, 0.911922, 0.876216, 0.894427, 0.911922, 0.911921, 0.911921, 0.928477, 0.957826, 0.980581, 0.998752, 0.838444, 0.656179, 0.447214, 0.465746, 0.707107, 0.838444, 0.970143, 0.988936, 0.995037, 0.995037, 0.995037, 0.995037, 0.957826, 0.838444, 0.8, 0, -0.707107 };
+
+float ny_init[N] = {-0.447214, -0.351123, -0.351123, -0.351123, -0.242536, -0.242536, 1, 0.928477, 0.83205, 0.868243, 1, -0.447214, -0.529999, -0.447214, -0.371391, -0.287348, -0.242536, -0.14834, -0.0995036, 0, 0.0995036, 0.14834, 0.242536, 0.287348, 0.410365, 0.6, 0.573462, 0.647648, 0.83205, 0.754606, -0.447214, -0.780869, -0.6, -0.371391, -0.242536, -0.242536, -0.242536, -0.14834, -0.0995036, -0.0499376, 0, 0, 0, -0.0499378, -0.0995039, -0.0995036, -0.196116, -0.33035, -0.410365, -0.481919, -0.447214, -0.410365, -0.410365, -0.410365, -0.37139, -0.287348, -0.196116, 0.0499373, 0.544988, 0.754606, 0.894427, 0.884918, 0.707107, 0.544988, 0.242536, 0.14834, 0.0995037, 0.0995037, 0.0995037, 0.0995037, 0.287348, 0.544988, 0.6, 1, 0.707107 };
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -303,11 +324,11 @@ void skybox() {
 	
 		glTexCoord2f(1.0, 0.0);        
         glVertex3f(skyWidth, skyWidth, -skyWidth);
-        glTexCoord2f(1.0, 1.0);        
+        glTexCoord2f(0.0, 0.0);        
         glVertex3f(skyWidth, skyWidth, skyWidth);
         glTexCoord2f(0.0, 1.0);        
         glVertex3f(-skyWidth, skyWidth, skyWidth);
-        glTexCoord2f(0.0, 0.0);        
+        glTexCoord2f(1.0, 1.0);        
         glVertex3f(-skyWidth, skyWidth, -skyWidth);
     
     glEnd();
@@ -536,6 +557,72 @@ void updateFireQueue()
     if(tick % 1 == 0) newFireParticle();   //Create a new particle every sec.
 }
 
+// Aliens
+
+void drawAlien(void) {
+    glPushMatrix();
+    glColor3f(0.0, 0.8, 0.53);
+
+    //Head
+	glPushMatrix();
+		glTranslatef(0, 1.8, 0);
+        glScalef(0.4, 0.4, 0.4);
+		glutSolidCube(1);
+	glPopMatrix();
+
+	//Torso
+	glPushMatrix();
+		glTranslatef(0, 1.35, 0);
+		glScalef(0.4, 0.5, 0.3);
+		glutSolidCube(1);
+	glPopMatrix();
+
+	//Right leg
+	glPushMatrix();
+		glTranslatef(-0.1, 1, 0);
+		glRotatef(-alienAng, 1, 0, 0);
+		glTranslatef(0.1, -1, 0);
+		glTranslatef(-0.1, 0.55, 0);
+		glScalef(0.1, 1.1, 0.1);
+		glutSolidCube(1);
+	glPopMatrix();
+
+	//Left leg
+	glPushMatrix();
+		glTranslatef(0.1, 1, 0);
+		glRotatef(alienAng, 1, 0, 0);
+		glTranslatef(-0.1, -1, 0);
+		glTranslatef(0.1, 0.55, 0);
+		glScalef(0.1, 1.1, 0.1);
+		glutSolidCube(1);
+	glPopMatrix();
+
+	//Right arm
+	glPushMatrix();
+		glTranslatef(-0.25, 1.6, 0);
+		glRotatef(alienAng, 1, 0, 0);
+		glTranslatef(0.25, -1.6, 0);
+		glTranslatef(-0.25, 1.15, 0);
+		glScalef(0.1, 1.1, 0.1);
+		glutSolidCube(1);
+	glPopMatrix();
+
+	//Left arm
+	glPushMatrix();
+		glTranslatef(0.25, 1.6, 0);
+		glRotatef(-alienAng, 1, 0, 0);
+		glTranslatef(-0.25, -1.6, 0);
+		glTranslatef(0.25, 1.15, 0);
+		glScalef(0.1, 1.1, 0.1);
+		glutSolidCube(1);
+	glPopMatrix();
+
+    
+
+    glPopMatrix();
+}
+
+
 //--------Rocket---------------------------
 
 void drawBody(void) {
@@ -558,31 +645,70 @@ void drawNose(void) {
 
 void drawNoseTip(void) {
     glPushMatrix();
-    glTranslatef(0, 24, 0);
-    glRotatef(-90, 1, 0, 0);
+    glTranslatef(0, 23, -1);
+    glTranslatef(1.0, 1.0, 0.0);
+    glRotatef(noseAng, 1, 0, 0);
+    glTranslatef(-1.0, -1.0, 0.0);
     gluCylinder(q, 1.0, 0.1, 2.0, 20.0, 5.0);
+    // gluDisk(q, 0.5, 0.5, 10, 10);
     glPopMatrix();
 }
 
-void drawNoseLights(void) {
+void drawRLights(void) {
     glPushMatrix();
     
     //Light1
-    glTranslatef(1.0, 24.0, 0.0);
-    glutSolidSphere(0.1, 20, 3);
-    glPopMatrix();
-    glPushMatrix();
+    glColor3f(rL1r, rL1g, 0.0);
+    glTranslatef(1.8, 20.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+    
+    
     //Light2
-    glRotatef(45, 0.0, 1.0, 0.0);
-    glTranslatef(1.0, 24.0, 0.0);
-    glutSolidSphere(0.1, 20, 3);
-    glPopMatrix();
-    glPushMatrix();
+    glColor3f(rL2r, rL2g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+    
     //Light3
-    glRotatef(90, 0.0, 1.0, 0.0);
-    glTranslatef(1.0, 24.0, 0.0);
-    glutSolidSphere(0.1, 20, 3);
+    
+    glColor3f(rL3r, rL3g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
 
+    //Light4
+    
+    glColor3f(rL4r, rL4g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+
+    //Light5
+    
+    glColor3f(rL5r, rL5g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+    
+    //Light6
+    glColor3f(rL6r, rL6g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+    
+    //Light7
+    
+    glColor3f(rL7r, rL7g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+
+    //Light8
+    
+    glColor3f(rL8r, rL8g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+
+    //Light9
+    
+    glColor3f(rL9r, rL9g, 0.0);
+    glTranslatef(0.0, -2.0, 0.0);
+    glutSolidSphere(0.4, 20, 3);
+    
     glPopMatrix();
 }
 
@@ -690,6 +816,16 @@ void drawBoosters(void) {
     glPopMatrix();
 }
 
+void walkingAlien(void) {
+    glPushMatrix();
+
+    glTranslatef(alien1X, alien1Y, 0.0);
+    glRotatef(90.0, 0.0, 1.0, 0.0);
+    drawAlien();
+
+    glPopMatrix();
+}
+
 void drawRocket(void) {
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
@@ -701,80 +837,23 @@ void drawRocket(void) {
     glBindTexture(GL_TEXTURE_2D, texId[10]);
     drawNose();
     drawNoseTip();
-    glColor3f(0.0, 1.0, 0.0);
-    drawNoseLights();
+    drawRLights();
+    glPushMatrix();
+    glTranslatef(-3.6, 0.0, 0.0);
+    drawRLights();
+    glPopMatrix();
     drawBoosters();
     glBindTexture(GL_TEXTURE_2D, texId[7]);
     glColor3f(1.0, 1.0, 1.0);
     drawEngines();
+    glPushMatrix();
+    glTranslatef(-10.0, .0, 0.0);
+    walkingAlien();
+    glPopMatrix();
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
 
-// Aliens
-
-void drawAlien(void) {
-    glPushMatrix();
-    glColor3f(0.0, 0.8, 0.53);
-
-    //Head
-	glPushMatrix();
-		glTranslatef(0, 1.8, 0);
-        glScalef(0.4, 0.4, 0.4);
-		glutSolidCube(1);
-	glPopMatrix();
-
-	//Torso
-	glPushMatrix();
-		glTranslatef(0, 1.35, 0);
-		glScalef(0.4, 0.5, 0.3);
-		glutSolidCube(1);
-	glPopMatrix();
-
-	//Right leg
-	glPushMatrix();
-		glTranslatef(-0.1, 1, 0);
-		glRotatef(-alienAng, 1, 0, 0);
-		glTranslatef(0.1, -1, 0);
-		glTranslatef(-0.1, 0.55, 0);
-		glScalef(0.1, 1.1, 0.1);
-		glutSolidCube(1);
-	glPopMatrix();
-
-	//Left leg
-	glPushMatrix();
-		glTranslatef(0.1, 1, 0);
-		glRotatef(alienAng, 1, 0, 0);
-		glTranslatef(-0.1, -1, 0);
-		glTranslatef(0.1, 0.55, 0);
-		glScalef(0.1, 1.1, 0.1);
-		glutSolidCube(1);
-	glPopMatrix();
-
-	//Right arm
-	glPushMatrix();
-		glTranslatef(-0.25, 1.6, 0);
-		glRotatef(alienAng, 1, 0, 0);
-		glTranslatef(0.25, -1.6, 0);
-		glTranslatef(-0.25, 1.15, 0);
-		glScalef(0.1, 1.1, 0.1);
-		glutSolidCube(1);
-	glPopMatrix();
-
-	//Left arm
-	glPushMatrix();
-		glTranslatef(0.25, 1.6, 0);
-		glRotatef(-alienAng, 1, 0, 0);
-		glTranslatef(-0.25, -1.6, 0);
-		glTranslatef(0.25, 1.15, 0);
-		glScalef(0.1, 1.1, 0.1);
-		glutSolidCube(1);
-	glPopMatrix();
-
-    
-
-    glPopMatrix();
-}
 
 
 //----------Tower -------------------
@@ -869,7 +948,7 @@ void drawTBridge(void) {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texId[9]);
     glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(5.0, 15.0, 0.0);
+    glTranslatef(6.0, 24.0, 0.0);
     glTranslatef(-3.0, -0.5, -1.0);
     glRotatef(-bridgeAngle, 0.0, 0.0, 1.0);
     glTranslatef(3.0, 0.5, 1.0);
@@ -913,16 +992,6 @@ void drawTBridge(void) {
     glPopMatrix();
 }
 
-void walkingAlien(void) {
-    glPushMatrix();
-
-    glTranslatef(alien1X, 15, 0.0);
-    glRotatef(90.0, 0.0, 1.0, 0.0);
-    drawAlien();
-
-    glPopMatrix();
-}
-
 void drawTower(void) {
     //Draws Tower
     glEnable(GL_TEXTURE_2D);
@@ -938,10 +1007,6 @@ void drawTower(void) {
     // Idk why but I can't move the textures for the others here
     glPushMatrix();
     drawTanks();
-    glPopMatrix();
-
-    glPushMatrix();
-    walkingAlien();
     glPopMatrix();
 
     glPushMatrix();
@@ -985,6 +1050,8 @@ void groundAlien(void) {
     glRotatef(alienTheta, 0.0, 1.0, 0.0);
     glTranslatef(5.0, 0.0, 4.0);
     drawAlien();
+    glTranslatef(0.8, 0.0, 0.4);
+    drawAlien();
     glPopMatrix();
 }
 
@@ -1005,7 +1072,7 @@ void drawRock(size_t i) {
 }
 
 void assignPeriphs(void) {
-    std::uniform_int_distribution<> distrib(-fWidth-20, fWidth-20);
+    std::uniform_int_distribution<> distrib(-fWidth+20, fWidth-20);
     std::uniform_int_distribution<> distribS(0.01, 1.5);
     for (size_t i = 0; i < 100; i++) {
         periphsX[i] = (float)distrib(gen);
@@ -1236,7 +1303,6 @@ void drawRocketShadows(void) {
     drawBody();
     drawNose();
     drawNoseTip();
-    drawNoseLights();
     drawBoosterShadows();
     drawEngines();
     glPopMatrix();
@@ -1302,7 +1368,87 @@ void drawShadows(float shadowMat[16]) {
     glEnable(GL_LIGHTING);
 }
 
+void lightSwitching(void) {
+    switch (lightSwitch)
+    {
+    case 2:
+        rL1r = 0.0;
+        rL1g = 1.0;
+        break;
+    case 4:
+        rL2r = 0.0;
+        rL2g = 1.0;
+        break;
+    case 6:
+        rL3r = 0.0;
+        rL3g = 1.0;
+        break;
+    case 8:
+        rL4r = 0.0;
+        rL4g = 1.0;
+        break;
+    case 10:
+        rL5r = 0.0;
+        rL5g = 1.0;
+        break;
+    case 12:
+        rL6r = 0.0;
+        rL6g = 1.0;
+        break;
+    case 14:
+        rL7r = 0.0;
+        rL7g = 1.0;
+        break;
+    case 16:
+        rL8r = 0.0;
+        rL8g = 1.0;
+        break;
+    case 18:
+        rL9r = 0.0;
+        rL9g = 1.0;
+        break;
 
+    case 20:
+        rL1r = 1.0;
+        rL1g = 0.0;
+        break;
+    case 22:
+        rL2r = 1.0;
+        rL2g = 0.0;
+        break;
+    case 24:
+        rL3r = 1.0;
+        rL3g = 0.0;
+        break;
+    case 26:
+        rL4r = 1.0;
+        rL4g = 0.0;
+        break;
+    case 28:
+        rL5r = 1.0;
+        rL5g = 0.0;
+        break;
+    case 30:
+        rL6r = 1.0;
+        rL6g = 0.0;
+        break;
+    case 32:
+        rL7r = 1.0;
+        rL7g = 0.0;
+        break;
+    case 34:
+        rL8r = 1.0;
+        rL8g = 0.0;
+        break;
+    case 36:
+        rL9r = 1.0;
+        rL9g = 0.0;
+        lightSwitch = 0.0;
+        break;
+    default:
+        break;
+    }
+}
 
 
 //----------draw a floor plane-------------------
@@ -1348,33 +1494,48 @@ void drawFloor()
 void myTimer(int value)
 {
     if (takeoff) {
-        if (alien1X > 2) {
-            alien1X -= 0.1;
-        } else if (bridgeAngle < 90) {
-            bridgeAngle ++;
+        if (alien1X < 10) {
+            alien1X += 0.1;
+            if (lightSwitch <35)
+            {
+                lightSwitch ++;
+            }
+        } else if (bridgeAngle > -90) {
+            alien1Y -= 0.2;
+            bridgeAngle --;
+            noseAng ++;
             meltRad += 0.075;
+            if (lightSwitch > 0 && lightFlip){
+                lightSwitch --;
+                lightFlip != lightFlip;
+            } else {
+                lightFlip != lightFlip;
+            }
+            
         } else {
             rocketHgt ++;
             meltRad -= 0.025;
-        }} else {
-            if (alienDirUp) {
-                if (alien1X < 8) {
-                    alien1X += 0.05;
-                } else {
-                    alienDirUp = false;
-                } 
+        }
+    } else {
+        if (alienDirUp) {
+            if (alien1X < 9) {
+                alien1X += 0.05;
             } else {
-                if (alien1X > 2) {
-                    alien1X -= 0.05;
-                } else {
-                    alienDirUp = true;
-                }
+                alienDirUp = false;
+            } 
+        } else {
+            if (alien1X > 4) {
+                alien1X -= 0.05;
+            } else {
+                alienDirUp = true;
             }
         }
+        lightSwitch +=2;
+    }
     // if (rocketHgt > skyWidth) {
     //     takeoff = false;
     // }
-    
+    lightSwitching();
     droneSearch();
 
     if (droneSUp) {
