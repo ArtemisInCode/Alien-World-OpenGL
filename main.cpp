@@ -1,7 +1,7 @@
 //  ========================================================================
 //  COSC363: Computer Graphics (2023);  University of Canterbury.
-//
-//  FILE NAME: Alien World
+//  Assignment 1; Alien World
+//  FILE NAME: main.cpp
 //
 //  Artemis Hingston 83986198
 //  Use left/right arrow keys to rotate camera left/right
@@ -19,8 +19,6 @@
 #include "loadBMP.h"
 using namespace std;
 
-
-//TODO clean up
 // https://www.desmos.com/calculator/imu6gndlfx for the spotlight math
 
 
@@ -91,16 +89,12 @@ bool aUp = true;
 float alien1X = 5;
 float alien1Y = 24;
 float alienTheta = 0;
-float alien2X = 0;
-float alien2Z = 0;
 float alienDirUp = true;
 
 
 GLuint texId[15];
 
 float white[4]  = {1.0, 1.0, 1.0, 1.0};
-float red[4]  = {1.0, 0.0, 0.0, 1.0};
-float green[4]  = {0.0, 1.0, 0.0, 1.0};
 float grey[4] = {0.2, 0.2, 0.2, 1.0};
 float yellow[4] = {1.0, 1.0, 0.0, 1.0};
 
@@ -187,7 +181,6 @@ void loadTextures(void) {
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
-    // https://opengameart.org/node/7551
     glBindTexture(GL_TEXTURE_2D, texId[7]);
     loadTGA("../textures/line_metal.tga");
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -198,14 +191,11 @@ void loadTextures(void) {
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-    //Image by kjpargeter on Freepik - idk what that was for anymore
-    // https://opengameart.org/content/metal-grate-gratealbedopng
     glBindTexture(GL_TEXTURE_2D, texId[9]);
     loadTGA("../textures/grate.tga");
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-    // https://opengameart.org/node/7603
     glBindTexture(GL_TEXTURE_2D, texId[10]);
     loadTGA("../textures/tunnel_corners.tga");
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -238,7 +228,7 @@ void loadTextures(void) {
 void skybox() {
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     glColor3f(1.0, 1.0, 1.0);
-    //Don't need this or the normals anymore
+
 	glEnable(GL_TEXTURE_2D);
 
     ////////////////////// LEFT ///////////////////////
@@ -449,9 +439,7 @@ void updateSnowQueue()
 		for (int i = 0; i < 3; i++)
 			(it->pos[i]) += it->vel[i];
 
-		// it->size = delta * 20 + 5;	//(5 - 25)
 		it->col = 1 - delta;		// (1 - 0)
-		// it->vel[0] = delta * 0.4;
 	}
 
     if(tick % 1 == 0) newSnowParticle();   //Create a new particle every sec.
@@ -551,7 +539,6 @@ void updateFireQueue()
 
 		it->size = delta * 7 + 3;	//(3 - 10)
 		it->col = 1 - delta;		// (1 - 0)
-		// it->vel[0] = delta * 0.4;
 	}
 
     if(tick % 1 == 0) newFireParticle();   //Create a new particle every sec.
@@ -624,9 +611,8 @@ void drawAlien(void) {
 
 
 //--------Rocket---------------------------
-
+//Draws the body of the rocket
 void drawBody(void) {
-    //Draws the body of the rocket
     glPushMatrix();
     glTranslatef(0, 22, 0);
     glRotatef(90, 1, 0, 0);
@@ -634,8 +620,8 @@ void drawBody(void) {
     glPopMatrix();
 }
 
+//Draws the head of the rocket
 void drawNose(void) {
-    //Draws the head of the rocket
     glPushMatrix();
     glTranslatef(0, 22, 0);
     glRotatef(-90, 1, 0, 0);
@@ -650,7 +636,6 @@ void drawNoseTip(void) {
     glRotatef(noseAng, 1, 0, 0);
     glTranslatef(-1.0, -1.0, 0.0);
     gluCylinder(q, 1.0, 0.1, 2.0, 20.0, 5.0);
-    // gluDisk(q, 0.5, 0.5, 10, 10);
     glPopMatrix();
 }
 
@@ -669,19 +654,16 @@ void drawRLights(void) {
     glutSolidSphere(0.4, 20, 3);
     
     //Light3
-    
     glColor3f(rL3r, rL3g, 0.0);
     glTranslatef(0.0, -2.0, 0.0);
     glutSolidSphere(0.4, 20, 3);
 
     //Light4
-    
     glColor3f(rL4r, rL4g, 0.0);
     glTranslatef(0.0, -2.0, 0.0);
     glutSolidSphere(0.4, 20, 3);
 
     //Light5
-    
     glColor3f(rL5r, rL5g, 0.0);
     glTranslatef(0.0, -2.0, 0.0);
     glutSolidSphere(0.4, 20, 3);
@@ -692,19 +674,16 @@ void drawRLights(void) {
     glutSolidSphere(0.4, 20, 3);
     
     //Light7
-    
     glColor3f(rL7r, rL7g, 0.0);
     glTranslatef(0.0, -2.0, 0.0);
     glutSolidSphere(0.4, 20, 3);
 
     //Light8
-    
     glColor3f(rL8r, rL8g, 0.0);
     glTranslatef(0.0, -2.0, 0.0);
     glutSolidSphere(0.4, 20, 3);
 
     //Light9
-    
     glColor3f(rL9r, rL9g, 0.0);
     glTranslatef(0.0, -2.0, 0.0);
     glutSolidSphere(0.4, 20, 3);
@@ -716,7 +695,6 @@ void drawRLights(void) {
 void drawBoostersBody(void) {
     glPushMatrix();
     
-
     glPushMatrix();
     glTranslatef(0, 17, 3);
     glRotatef(90, 1, 0, 0);
@@ -734,7 +712,6 @@ void drawBoostersBody(void) {
 
 void drawBoostersNose(void) {
     glPushMatrix();
-    // glColor3f(0.5, 0.5, 0.5);
 
     glPushMatrix();
     glTranslatef(0, 17, 3);
@@ -770,10 +747,9 @@ void drawBoostersEngine(void) {
 }
 
 
-
+//Draws engines of the rocket
 void drawEngines(void) {
-    //Draws an engine of the rocket
-
+    
     glPushMatrix();
     
     glPushMatrix();
@@ -853,7 +829,6 @@ void drawRocket(void) {
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
-
 
 
 //----------Tower -------------------
@@ -953,7 +928,6 @@ void drawTBridge(void) {
     glRotatef(-bridgeAngle, 0.0, 0.0, 1.0);
     glTranslatef(3.0, 0.5, 1.0);
 
-    
     glBegin(GL_QUADS);
 
     // Front wall
@@ -992,8 +966,9 @@ void drawTBridge(void) {
     glPopMatrix();
 }
 
+//Draws Tower
 void drawTower(void) {
-    //Draws Tower
+    
     glEnable(GL_TEXTURE_2D);
     glPushMatrix();
     glTranslatef(-5.0, 0.0, 0.0);
@@ -1029,8 +1004,8 @@ void drawLaunchMelt(void) {
     glPopMatrix();
 }
 
+//Draws rocket and tower set up
 void drawRocketSet(void) {
-    //Draws rocket and tower set up
     
     glPushMatrix();
 
@@ -1043,7 +1018,6 @@ void drawRocketSet(void) {
 }
 
 // Second Alien
-
 void groundAlien(void) {
     glPushMatrix();
     glTranslatef(-25.0, 0.0, 5.0);
@@ -1056,8 +1030,6 @@ void groundAlien(void) {
 }
 
 // Environment peripherals
-
-// Dome building
 
 void drawRock(size_t i) {
     glPushMatrix();
@@ -1079,7 +1051,6 @@ void assignPeriphs(void) {
         periphsZ[i] = (float)distrib(gen);
         periphsS[i] = (float)distribS(gen);
     }
-
 }
 
 void drawPeriphs(void) {
@@ -1092,9 +1063,9 @@ void drawPeriphs(void) {
         drawRock(i);
         glPopMatrix();
     }
-
     glPopMatrix();
 }
+
 
 // Drone
 
@@ -1103,7 +1074,6 @@ void drawDBody(void) {
 
     glTranslatef(0.0, 0.2, 0.0);
     glScalef(0.4, 0.4, 0.4);
-    
     glutSolidCube(1.0);
 
 	glPopMatrix();
@@ -1184,13 +1154,11 @@ void drawDrone(void) {
     drawDArms();
     drawDBlades();
 
-
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spotDir);
     glLightfv(GL_LIGHT1, GL_POSITION, spotPosn);
     
 	glPopMatrix();
 }
-
 
 // Drone Spotlight Calculations for animation
 void droneSearch(void) {
@@ -1285,7 +1253,6 @@ void drawLake(void) {
 }
 
 
-
 // Shadows
 
 void drawBoosterShadows(void) {
@@ -1307,8 +1274,6 @@ void drawRocketShadows(void) {
     drawEngines();
     glPopMatrix();
 }
-
-
 
 void drawTankShadow(void) {
     glPushMatrix();
@@ -1340,20 +1305,14 @@ void drawTowerShadow(void) {
     glPopMatrix();
     drawTankShadow();
     glPopMatrix();
-
 }
 
+//Draws rocket and tower set up shadows
 void drawRocketSetShadow(void) {
-    //Draws rocket and tower set up
-
     glPushMatrix();
-
     glTranslatef(0, 0, 15);
-
 	drawRocketShadows();
-
     drawTowerShadow();
-
 	glPopMatrix();
 }
 
@@ -1452,35 +1411,27 @@ void lightSwitching(void) {
 
 
 //----------draw a floor plane-------------------
-void drawFloor()
-{
-
+void drawFloor() {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texId[6]);
 	glBegin(GL_QUADS);
 	glNormal3f(0, 1, 0);
-    // float alpha = 1;
 	for(int x = -fWidth; x <= fWidth; x ++)
 	{
 		for(int z = -fWidth; z <= fWidth; z ++)
 		{
-            // alpha = (float)((x+fWidth)/(2*fWidth) +(z+fWidth)/(2*fWidth))/2;
 			glColor3f(1.0, 1.0, 1.0);
 
             glTexCoord2f((float)(x+fWidth)/(2*fWidth), (float)(z+fWidth)/(2*fWidth));
-            // glTexCoord2f(0, 0);
 			glVertex3f(x, -0.1, z);
 
             glTexCoord2f((float)(x+fWidth)/(2*fWidth), (float)(z+fWidth+1)/(2*fWidth));
-            // glTexCoord2f(0, 1);
 			glVertex3f(x, -0.1, z+1);
 
             glTexCoord2f((float)(x+fWidth+1)/(2*fWidth), (float)(z+fWidth+1)/(2*fWidth));
-            // glTexCoord2f(1, 1);
 			glVertex3f(x+1, -0.1, z+1);
 
             glTexCoord2f((float)(x+fWidth+1)/(2*fWidth), (float)(z+fWidth)/(2*fWidth));
-            // glTexCoord2f(1, 0);
 			glVertex3f(x+1, -0.1, z);
 		}
 	}
@@ -1567,14 +1518,6 @@ void myTimer(int value)
 		alienAng -= 2;
 	}
     alienTheta += 0.5;
-    //Alien walking translation
-    
-    
-    
-    
-
-    // alienZ +=0.1;
-    // alien1X;
 
     tick++;
     if (tick == INT_MAX) tick = 0;
@@ -1582,28 +1525,22 @@ void myTimer(int value)
     updateSnowQueue();
     updateFireQueue();
 
-
     glutPostRedisplay();
 	glutTimerFunc(50, myTimer, 0);
 }
 
 
-//--Display: ----------------------------------------------------------------------
-//--This is the main display module containing function calls for generating
-//--the scene.
 void display()  
 {
 	float lpos[4] = {100., 100., 100., 1.0};  //light's position
     float shadowMat[16] = {lpos[1], 0, 0, 0, -lpos[0], 0, -lpos[2], -1, 0, 0, lpos[1], 0, 0, 0, 0, lpos[1]};
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);    //GL_LINE = Wireframe;   GL_FILL = Solid
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
     glLightfv(GL_LIGHT0, GL_POSITION, lpos);   //set light position
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-    // gluLookAt(80, 150, 80,  0, 0, 0,   0, 1, 0); //TESTING
     gluLookAt(eye_x, eye_y, eye_z,  look_x, look_y, look_z,   0, 1, 0);	
-
 
     glEnable(GL_LIGHTING);
 
@@ -1617,7 +1554,6 @@ void display()
     drawPeriphs();
     drawShadows(shadowMat);
     drawRocketSet();
-
     
     list<particle>::iterator it;
     for (it = snowParList.begin(); it != snowParList.end(); it++)
@@ -1629,12 +1565,8 @@ void display()
         drawFireParticle(it->col, it->size, it->pos[0], it->pos[1], it->pos[2]);
         }
     }
-    
-    
 
 	glPopMatrix();
-
-
 	glutSwapBuffers();
 }
 
@@ -1671,7 +1603,6 @@ void initialize()
     glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0);
     
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60., 1., 1., 1000.);  //The camera view volume  
@@ -1700,7 +1631,6 @@ void special(int key, int x, int y)
 	look_z = eye_z - 100*cos(angle);
 	glutPostRedisplay();
 }
-
 
 
 //------------ Space key event callback ---------------------------------
