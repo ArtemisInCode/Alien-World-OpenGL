@@ -1,9 +1,7 @@
 //  ========================================================================
 //  COSC363: Computer Graphics (2023);  University of Canterbury.
-//  Assignment 1; Alien World
 //  FILE NAME: main.cpp
 //
-//  Artemis Hingston 83986198
 //  Use left/right arrow keys to rotate camera left/right
 //  Use up/down arrow keys to move camera forward/back
 //  ========================================================================
